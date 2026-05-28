@@ -10,9 +10,13 @@ from battle import BattleScene
 
 def main() -> int:
     pygame.init()
+    pygame.mixer.init()
     try:
         screen = pygame.display.set_mode((config.SCREEN_W, config.SCREEN_H))
         pygame.display.set_caption(config.TITLE)
+        pygame.mixer.music.load(config.MUSIC_FILE)
+        pygame.mixer.music.set_volume(config.MUSIC_VOLUME)
+        pygame.mixer.music.play(-1)
         clock = pygame.time.Clock()
 
         scene = BattleScene()

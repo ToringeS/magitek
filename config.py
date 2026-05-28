@@ -6,6 +6,10 @@ SCREEN_H = 480
 FPS = 60
 TITLE = "Magitek — M3"
 
+# Music
+MUSIC_FILE = "Tales from Southern Realms.mp3"
+MUSIC_VOLUME = 0.4  # 0.0 to 1.0
+
 # Colors (R, G, B)
 BG = (24, 24, 32)  # retained for reference; the scene draws a gradient instead
 TEXT = (235, 235, 240)
