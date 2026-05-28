@@ -12,4 +12,7 @@ each independently shippable. Python + pygame.
   flag ambiguities before writing code.
 
 ## Current milestone
-docs/MILESTONE-0.md (tracked in GitHub issue #1)
+docs/MILESTONE-1.md (tracked in GitHub issue #2)
+
+## Shipped
+- M0 — one ATB battle, Attack only (issue #1)
