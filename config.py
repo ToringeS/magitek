@@ -6,6 +6,9 @@ SCREEN_H = 480
 FPS = 60
 TITLE = "Magitek — M3"
 
+# Font
+FONT_FILE = "PressStart2P-Regular.ttf"
+
 # Music
 MUSIC_FILE = "Tales from Southern Realms.mp3"
 MUSIC_VOLUME = 0.4  # 0.0 to 1.0
@@ -103,7 +106,7 @@ BG_STAR_COUNT    = 80
 # Stats: (HP, MP, attack, defense, speed). MP optional; absent = 0.
 HERO_STATS_LIST = [
     {
-        "name": "Hero 1",
+        "name": "Terra",
         "hp": 100,
         "mp": 30,
         "attack": 20,
@@ -111,7 +114,7 @@ HERO_STATS_LIST = [
         "speed": 12,
     },
     {
-        "name": "Hero 2",
+        "name": "Locke",
         "hp": 70,
         "mp": 50,
         "attack": 12,
@@ -122,14 +125,14 @@ HERO_STATS_LIST = [
 
 ENEMY_STATS_LIST = [
     {
-        "name": "Enemy 1",
+        "name": "Forest Imp",
         "hp": 60,
         "attack": 12,
         "defense": 3,
         "speed": 9,
     },
     {
-        "name": "Enemy 2",
+        "name": "Dark Wisp",
         "hp": 50,
         "attack": 10,
         "defense": 2,

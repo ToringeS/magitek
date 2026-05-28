@@ -455,16 +455,17 @@ class BattleScene:
     def _goto_over(self) -> None:
         self.state = OVER
         self.outcome = self.pending_outcome
+        pygame.mixer.music.fadeout(2000)
 
     # ---- draw ----------------------------------------------------------
 
     def _ensure_fonts(self) -> None:
         if self._font_small is None:
-            self._font_small = pygame.font.Font(None, 22)
+            self._font_small = pygame.font.Font(config.FONT_FILE, 14)
         if self._font_large is None:
-            self._font_large = pygame.font.Font(None, 56)
+            self._font_large = pygame.font.Font(config.FONT_FILE, 36)
         if self._font_damage is None:
-            self._font_damage = pygame.font.Font(None, 32)
+            self._font_damage = pygame.font.Font(config.FONT_FILE, 18)
 
     def _ensure_background(self) -> None:
         if self._bg_sky is not None:
@@ -479,7 +480,7 @@ class BattleScene:
             color = tuple(int(config.BG_TOP[i] * (1 - r) + config.BG_BOTTOM[i] * r) for i in range(3))
             pygame.draw.line(sky, color, (0, y), (W, y))
         pygame.draw.rect(sky, config.BG_BOTTOM, (0, HZ, W, H - HZ))
-        mx, my, mr = W - 90, 55, 28
+        mx, my, mr = W - 90, 90, 28
         pygame.draw.circle(sky, config.BG_MOON, (mx, my), mr)
         pygame.draw.circle(sky, config.BG_MOON_SHADOW, (mx + 10, my - 6), mr - 4)
         self._bg_sky = sky
