@@ -16,6 +16,10 @@ class Combatant:
     mp: int = 0
     max_mp: int = 0
     atb: float = 0.0
+    # Visual-only smoothing targets for HP and ATB bars. Battle math reads
+    # `hp` / `atb`; rendering reads these so the bars can interpolate.
+    display_hp: float = 0.0
+    display_atb: float = 0.0
 
     @property
     def alive(self) -> bool:
@@ -41,15 +45,18 @@ class Combatant:
 
 def _from_stats(stats: dict) -> Combatant:
     mp = stats.get("mp", 0)
+    hp = stats["hp"]
     return Combatant(
         name=stats["name"],
-        hp=stats["hp"],
-        max_hp=stats["hp"],
+        hp=hp,
+        max_hp=hp,
         mp=mp,
         max_mp=mp,
         attack=stats["attack"],
         defense=stats["defense"],
         speed=stats["speed"],
+        display_hp=float(hp),
+        display_atb=0.0,
     )
 
 
