@@ -1,17 +1,26 @@
-"""Hardcoded constants for M2: ATB battle, Attack + Magic (Fire), + game feel."""
+"""Hardcoded constants for M3: 2v2 ATB battle, single-target Attack + Fire."""
 
 # Display
 SCREEN_W = 640
 SCREEN_H = 480
 FPS = 60
-TITLE = "Magitek — M2"
+TITLE = "Magitek — M3"
 
 # Colors (R, G, B)
-BG = (24, 24, 32)  # retained for reference; M2 draws a gradient instead
+BG = (24, 24, 32)  # retained for reference; the scene draws a gradient instead
 TEXT = (235, 235, 240)
 TEXT_DIM = (130, 130, 145)
-HERO = (90, 160, 230)
-ENEMY = (200, 90, 90)
+HERO_COLORS = [
+    (90, 160, 230),   # Hero 1 — blue
+    (140, 200, 110),  # Hero 2 — green
+]
+ENEMY_COLORS = [
+    (200, 90, 90),    # Enemy 1 — red
+    (180, 100, 180),  # Enemy 2 — purple
+]
+# Legacy aliases (kept so anything still importing HERO/ENEMY keeps building).
+HERO = HERO_COLORS[0]
+ENEMY = ENEMY_COLORS[0]
 HP_FILL = (90, 200, 110)
 HP_EMPTY = (60, 40, 40)
 MP_FILL = (110, 150, 230)
@@ -21,10 +30,23 @@ ATB_EMPTY = (40, 40, 60)
 MENU_BG = (40, 40, 56)
 MENU_BORDER = (120, 120, 140)
 CURSOR = (235, 235, 240)
+TARGET_CURSOR = (240, 200, 80)
+ACTIVE_HERO_MARKER = (235, 235, 240)
 
 # Battle
 ATB_MAX = 100.0
 DAMAGE_VARIANCE = (0.8, 1.2)
+
+# --- Layout (4 slots, two columns) ------------------------------------
+
+# Bodies are smaller than M2 to fit four combatants on a 640x480 screen
+# with HP/MP/ATB bars under each.
+BODY_W = 140
+BODY_H = 90
+SLOT_TOP_Y = 40
+SLOT_BOTTOM_Y = 250
+ENEMY_COL_X = 50
+HERO_COL_X = SCREEN_W - 50 - BODY_W
 
 # --- M2: animation / game feel ----------------------------------------
 
@@ -65,24 +87,43 @@ BG_FLOOR = (28, 22, 36)
 BG_HORIZON = int(SCREEN_H * 0.66)
 
 # Stats: (HP, MP, attack, defense, speed). MP optional; absent = 0.
-HERO_STATS = {
-    "name": "Hero",
-    "hp": 100,
-    "mp": 30,
-    "attack": 20,
-    "defense": 5,
-    "speed": 12,
-}
+HERO_STATS_LIST = [
+    {
+        "name": "Hero 1",
+        "hp": 100,
+        "mp": 30,
+        "attack": 20,
+        "defense": 5,
+        "speed": 12,
+    },
+    {
+        "name": "Hero 2",
+        "hp": 70,
+        "mp": 50,
+        "attack": 12,
+        "defense": 3,
+        "speed": 14,
+    },
+]
 
-ENEMY_STATS = {
-    "name": "Enemy",
-    "hp": 60,
-    "attack": 12,
-    "defense": 3,
-    "speed": 9,
-}
+ENEMY_STATS_LIST = [
+    {
+        "name": "Enemy 1",
+        "hp": 60,
+        "attack": 12,
+        "defense": 3,
+        "speed": 9,
+    },
+    {
+        "name": "Enemy 2",
+        "hp": 50,
+        "attack": 10,
+        "defense": 2,
+        "speed": 11,
+    },
+]
 
-# Spells: plain data so M2+ can extend the list without code changes.
+# Spells: plain data so future milestones can extend the list without code changes.
 SPELLS = [
     {"name": "Fire", "mp_cost": 10, "power": 25, "ignores_defense": True},
 ]

@@ -1,4 +1,4 @@
-"""Combatant data for the M1 battle. No pygame imports — pure data."""
+"""Combatant data for the M3 battle. No pygame imports — pure data."""
 
 from dataclasses import dataclass
 
@@ -60,9 +60,11 @@ def _from_stats(stats: dict) -> Combatant:
     )
 
 
-def make_hero() -> Combatant:
-    return _from_stats(config.HERO_STATS)
+def make_party() -> list[Combatant]:
+    """Return the hero party in display order (index 0 = top slot)."""
+    return [_from_stats(s) for s in config.HERO_STATS_LIST]
 
 
-def make_enemy() -> Combatant:
-    return _from_stats(config.ENEMY_STATS)
+def make_enemies() -> list[Combatant]:
+    """Return the enemy party in display order (index 0 = top slot)."""
+    return [_from_stats(s) for s in config.ENEMY_STATS_LIST]
