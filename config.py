@@ -80,11 +80,21 @@ DEATH_SINK = 20
 # Smooth bars — exponential decay rate. Higher = snappier.
 BAR_INTERP_RATE = 10.0
 
-# Background — vertical gradient with a darker floor band.
-BG_TOP = (28, 26, 44)
-BG_BOTTOM = (52, 32, 56)
-BG_FLOOR = (28, 22, 36)
-BG_HORIZON = int(SCREEN_H * 0.66)
+# Background — forest night scene.
+BG_TOP           = (4,   7,  18)
+BG_BOTTOM        = (14,  12, 36)
+BG_FLOOR         = (12,  22, 14)
+BG_HORIZON       = int(SCREEN_H * 0.60)
+BG_STAR          = (210, 220, 255)
+BG_MOON          = (245, 242, 210)
+BG_MOON_SHADOW   = (10,   8,  22)
+BG_MTN_FAR       = (18,  24, 36)
+BG_MTN_MID       = (14,  28, 18)
+BG_TREE_FAR      = (10,  20, 14)
+BG_TREE_MID      = (8,   16, 10)
+BG_TREE_NEAR     = (6,   12,  8)
+BG_STAR_SPEED    = 1.5   # pixels per second downward
+BG_STAR_COUNT    = 80
 
 # Stats: (HP, MP, attack, defense, speed). MP optional; absent = 0.
 HERO_STATS_LIST = [

@@ -26,6 +26,24 @@ from effects import Action, DamageNumber, DeathFade, HitReaction
 from entities import Combatant, make_enemies, make_party
 
 
+class _Star:
+    def __init__(self, rng: random.Random) -> None:
+        self.x = rng.randint(0, config.SCREEN_W)
+        self.y = float(rng.randint(0, config.BG_HORIZON - 10))
+        self.r = rng.choice([1, 1, 1, 2])
+        self.alpha = rng.randint(140, 255)
+
+    def update(self, dt: float) -> None:
+        self.y += config.BG_STAR_SPEED * dt
+        if self.y > config.BG_HORIZON:
+            self.y = 0.0
+
+    def draw(self, surface: pygame.Surface) -> None:
+        surf = pygame.Surface((self.r * 2 + 1, self.r * 2 + 1), pygame.SRCALPHA)
+        pygame.draw.circle(surf, (*config.BG_STAR, self.alpha), (self.r, self.r), self.r)
+        surface.blit(surf, (int(self.x) - self.r, int(self.y) - self.r))
+
+
 # Sub-states
 RUNNING = "running"
 HERO_MENU = "hero_menu"
@@ -121,7 +139,9 @@ class BattleScene:
         self._font_small: pygame.font.Font | None = None
         self._font_large: pygame.font.Font | None = None
         self._font_damage: pygame.font.Font | None = None
-        self._bg_surface: pygame.Surface | None = None
+        self._bg_sky: pygame.Surface | None = None
+        self._bg_foreground: pygame.Surface | None = None
+        self._stars: list[_Star] | None = None
 
     def _slot_for(self, c: Combatant) -> _Slot:
         return self._slots[id(c)]
@@ -271,6 +291,9 @@ class BattleScene:
         self._clock += dt
         self._tick_smoothing(dt)
         self._tick_overlays(dt)
+        if self._stars is not None:
+            for star in self._stars:
+                star.update(dt)
 
         if self.state == ACTION:
             self._update_action(dt)
@@ -444,39 +467,69 @@ class BattleScene:
             self._font_damage = pygame.font.Font(None, 32)
 
     def _ensure_background(self) -> None:
-        if self._bg_surface is not None:
+        if self._bg_sky is not None:
             return
-        s = pygame.Surface((config.SCREEN_W, config.SCREEN_H))
-        for y in range(config.SCREEN_H):
-            r = y / max(1, config.SCREEN_H - 1)
-            color = tuple(
-                int(config.BG_TOP[i] * (1.0 - r) + config.BG_BOTTOM[i] * r)
-                for i in range(3)
-            )
-            pygame.draw.line(s, color, (0, y), (config.SCREEN_W, y))
-        pygame.draw.rect(
-            s,
-            config.BG_FLOOR,
-            pygame.Rect(
-                0,
-                config.BG_HORIZON,
-                config.SCREEN_W,
-                config.SCREEN_H - config.BG_HORIZON,
-            ),
-        )
-        pygame.draw.line(
-            s,
-            tuple(min(255, v + 24) for v in config.BG_FLOOR),
-            (0, config.BG_HORIZON),
-            (config.SCREEN_W, config.BG_HORIZON),
-        )
-        self._bg_surface = s
+
+        W, H, HZ = config.SCREEN_W, config.SCREEN_H, config.BG_HORIZON
+
+        # Sky layer — gradient + moon.
+        sky = pygame.Surface((W, H))
+        for y in range(HZ):
+            r = y / max(1, HZ - 1)
+            color = tuple(int(config.BG_TOP[i] * (1 - r) + config.BG_BOTTOM[i] * r) for i in range(3))
+            pygame.draw.line(sky, color, (0, y), (W, y))
+        pygame.draw.rect(sky, config.BG_BOTTOM, (0, HZ, W, H - HZ))
+        mx, my, mr = W - 90, 55, 28
+        pygame.draw.circle(sky, config.BG_MOON, (mx, my), mr)
+        pygame.draw.circle(sky, config.BG_MOON_SHADOW, (mx + 10, my - 6), mr - 4)
+        self._bg_sky = sky
+
+        # Foreground layer — mountains, floor, trees (SRCALPHA so sky shows through gaps).
+        fg = pygame.Surface((W, H), pygame.SRCALPHA)
+
+        def mountain_row(peaks: list, color: tuple) -> None:
+            pts = [(0, HZ)] + list(peaks) + [(W, HZ)]
+            pygame.draw.polygon(fg, color, pts)
+
+        mountain_row([
+            (0, HZ-30),(80, HZ-70),(160, HZ-50),(240, HZ-90),
+            (320, HZ-60),(400, HZ-80),(480, HZ-55),(560, HZ-75),(W, HZ-40),
+        ], config.BG_MTN_FAR)
+        mountain_row([
+            (0, HZ-10),(60, HZ-40),(130, HZ-25),(200, HZ-55),
+            (280, HZ-35),(360, HZ-50),(440, HZ-30),(520, HZ-45),(W, HZ-20),
+        ], config.BG_MTN_MID)
+
+        pygame.draw.rect(fg, config.BG_FLOOR, (0, HZ, W, H - HZ))
+
+        def tree_row(y_base: int, height_range: tuple, width_range: tuple, color: tuple, seed: int) -> None:
+            rng = random.Random(seed)
+            x = 0
+            while x < W:
+                h = rng.randint(*height_range)
+                w = rng.randint(*width_range)
+                pygame.draw.polygon(fg, color, [(x + w // 2, y_base - h), (x, y_base), (x + w, y_base)])
+                x += w + rng.randint(0, 8)
+
+        tree_row(HZ + 20, (40, 70),  (22, 38), config.BG_TREE_FAR,  1)
+        tree_row(HZ + 40, (55, 90),  (28, 48), config.BG_TREE_MID,  2)
+        tree_row(HZ + 65, (70, 115), (34, 58), config.BG_TREE_NEAR, 3)
+        self._bg_foreground = fg
+
+        # Stars.
+        rng = random.Random(7)
+        self._stars = [_Star(rng) for _ in range(config.BG_STAR_COUNT)]
 
     def draw(self, surface: pygame.Surface) -> None:
         self._ensure_fonts()
         self._ensure_background()
-        assert self._bg_surface is not None
-        surface.blit(self._bg_surface, (0, 0))
+        assert self._bg_sky is not None
+        assert self._bg_foreground is not None
+        assert self._stars is not None
+        surface.blit(self._bg_sky, (0, 0))
+        for star in self._stars:
+            star.draw(surface)
+        surface.blit(self._bg_foreground, (0, 0))
 
         # Bodies first (in column order), then bars, then markers/cursors,
         # then floating numbers, then menu, then over screen.
